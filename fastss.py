@@ -1,5 +1,12 @@
-""" A simple implementation of FastSS """
+""" A simple implementation of FastSS
 
+Command-line Usage:
+
+  fastss.py -a database.dat words - Add words to the database.
+  fastss.py -q database.dat words - Query the database with words.
+"""
+
+from __future__ import print_function
 import dbm
 import pickle
 
@@ -76,3 +83,30 @@ def editdist(s, t):
                                      matrix[(i-1, j-1)]) + 1
 
     return matrix[(i, j)]
+
+if __name__ == '__main__':
+    import getopt
+    import sys
+
+    action = None
+
+    opts, args = getopt.getopt(sys.argv[1:], 'aq')
+    for key, val in opts:
+        if key == '-a':
+            action = 'ADD'
+        elif key == "-q":
+            action = 'QUERY'
+
+    if not action or not args:
+        print(__doc__, file=sys.stderr)
+        sys.exit(1)
+
+    if action == 'ADD':
+        with FastSS.open(args[0], 'c') as fastss:
+            for word in args[1:]:
+                fastss.add(word)
+
+    elif action == 'QUERY':
+        with FastSS.open(args[0], 'r') as fastss:
+            for word in args[1:]:
+                print(word, fastss.get(word), sep=': ')
