@@ -20,10 +20,10 @@ are passed, it tried to decode them using the locale encoding.
 ### 3. Save format (a.k.a. JSON vs Pickle)
 
 The native Pickle module is slower to encode/decode than the json module.
-(Alghough, cPickle is much comparable)
+(Although, cPickle is much comparable)
 
 Some points to consider:
 
 * Pickle bytestream is incompatible among Python versions. We might
   avoid compatibility issues by using protocol version 2 or below.
-* JSON cannot seriealize Python set objects.
+* JSON cannot serialize Python set objects.
