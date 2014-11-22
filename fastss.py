@@ -38,7 +38,7 @@ class FastSS:
             value = {word}
 
             if key in self.indexdb:
-                value |= self.indexdb[key]
+                value |= pickle.loads(self.indexdb[key])
 
             self.indexdb[key] = pickle.dumps(value)
 
