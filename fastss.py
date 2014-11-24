@@ -2,7 +2,8 @@
 
 Command-line Usage:
 
-  fastss.py -a database.dat [filepath] - Read lines from file (or stdin) as input.
+  fastss.py -c database.dat [filepath] - Create new database with inputs from file (or stdin)
+  fastss.py -a database.dat [filepath] - Update exisitng database with inputs from file (or stdin)
   fastss.py -q database.dat string     - Query database with string.
 """
 
