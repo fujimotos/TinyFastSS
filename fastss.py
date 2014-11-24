@@ -10,6 +10,7 @@ from __future__ import print_function
 import dbm
 import pickle
 import locale
+import struct
 import itertools
 
 KEY_ENCODING = 'utf8'
@@ -17,11 +18,17 @@ KEY_ENCODING = 'utf8'
 class FastSS:
     def __init__(self, indexdb):
         self.indexdb = indexdb
+        self.dist = struct.unpack('B', indexdb['__dist__'])[0]
         self.locale_encoding = locale.getpreferredencoding()
 
     @classmethod
-    def open(cls, dbpath, flag='c'):
-        return cls(dbm.open(dbpath, flag))
+    def open(cls, dbpath, flag='c', dist=2):
+        indexdb = dbm.open(dbpath, flag)
+
+        if b'__dist__' not in indexdb:
+            indexdb[b'__dist__'] = struct.pack('B', dist)
+
+        return cls(indexdb)
 
     def close(self):
         self.indexdb.close()
@@ -48,7 +55,7 @@ class FastSS:
         if isinstance(word, bytes):
             word = word.decode(self.locale_encoding)
 
-        for key in self.indexkeys(word):
+        for key in self.indexkeys(word, self.dist):
             value = {word}
 
             if key in self.indexdb:
@@ -57,19 +64,19 @@ class FastSS:
             self.indexdb[key] = pickle.dumps(value)
 
     def get(self, word):
-        result = ([], [], [])
+        result = {x: [] for x in range(self.dist+1)}
         candidate = set()
 
         if isinstance(word, bytes):
             word = word.decode(self.locale_encoding)
 
-        for key in self.indexkeys(word):
+        for key in self.indexkeys(word, self.dist):
             if key in self.indexdb:
                 candidate.update(pickle.loads(self.indexdb[key]))
 
         for cand in candidate:
             dist = editdist(word, cand)
-            if dist < 3:
+            if dist <= self.dist:
                 result[dist].append(cand)
 
         return result
