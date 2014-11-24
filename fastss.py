@@ -2,9 +2,13 @@
 
 Command-line Usage:
 
-  fastss.py -c database.dat [filepath] - Create new database with inputs from file (or stdin)
-  fastss.py -a database.dat [filepath] - Update exisitng database with inputs from file (or stdin)
-  fastss.py -q database.dat string     - Query database with string.
+  fastss.py -c database.dat filepath - Create new database with input stream.
+  fastss.py -a database.dat filepath - Update database using input stream.
+  fastss.py -q database.dat string   - Query database with string.
+
+Create Options:
+
+  --maxdist <N> - Maximum edit distance for the database (default: 2)
 """
 
 from __future__ import print_function
@@ -119,22 +123,25 @@ if __name__ == '__main__':
 
     CREATE, APPEND, QUERY = 1, 2, 3
     dbpath, action, flag = None, None, None
+    max_dist = 2
 
-    opts, args = getopt.getopt(sys.argv[1:], 'c:a:q:')
+    opts, args = getopt.getopt(sys.argv[1:], 'c:a:q:', 'maxdist=')
     for key, val in opts:
         if key == '-c':
             dbpath, action, flag = val, CREATE, 'n'
-        if key == '-a':
+        elif key == '-a':
             dbpath, action, flag = val, APPEND, 'c'
         elif key == "-q":
             dbpath, action, flag = val, QUERY, 'r'
+        elif key == "--maxdist":
+            max_dist = int(val)
 
     if action is None or dbpath is None:
         print(__doc__, file=sys.stderr)
         sys.exit(1)
 
     if action in (CREATE, APPEND):
-        with FastSS.open(dbpath, flag) as fastss:
+        with FastSS.open(dbpath, flag, max_dist) as fastss:
             for line in fileinput.input(args):
                 line = line.strip()
                 if line:
