@@ -21,6 +21,16 @@ class TestWriteGzip(unittest.TestCase):
         self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
                                 b'st', b'et', b'es', b'tt', b'ts', b'te'})
 
+        keys = FastSS.indexkeys('test', 3)
+        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
+                                b'st', b'et', b'es', b'tt', b'ts', b'te',
+                                b't', b'e', b's', b't'})
+
+        keys = FastSS.indexkeys('test', 4)
+        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
+                                b'st', b'et', b'es', b'tt', b'ts', b'te',
+                                b't', b'e', b's', b't', b''})
+
     def test_create_database(self):
         dbpath = os.path.join(self.tmpdir, self.DBNAME)
 
