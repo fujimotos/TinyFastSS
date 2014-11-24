@@ -2,8 +2,8 @@
 
 Command-line Usage:
 
-  fastss.py -a database.dat words - Add words to the database.
-  fastss.py -q database.dat words - Query the database with words.
+  fastss.py -a database.dat [filepath] - Read lines from file (or stdin) as input.
+  fastss.py -q database.dat string     - Query database with string.
 """
 
 from __future__ import print_function
@@ -114,27 +114,32 @@ def editdist(s, t):
 if __name__ == '__main__':
     import getopt
     import sys
+    import fileinput
 
-    ADD, QUERY = 1, 2
-    action = None
+    CREATE, APPEND, QUERY = 1, 2, 3
+    dbpath, action, flag = None, None, None
 
-    opts, args = getopt.getopt(sys.argv[1:], 'aq')
+    opts, args = getopt.getopt(sys.argv[1:], 'c:a:q:')
     for key, val in opts:
+        if key == '-c':
+            dbpath, action, flag = val, CREATE, 'n'
         if key == '-a':
-            action = ADD
+            dbpath, action, flag = val, APPEND, 'c'
         elif key == "-q":
-            action = QUERY
+            dbpath, action, flag = val, QUERY, 'r'
 
-    if not action or not args:
+    if action is None or dbpath is None:
         print(__doc__, file=sys.stderr)
         sys.exit(1)
 
-    if action == ADD:
-        with FastSS.open(args[0], 'c') as fastss:
-            for word in args[1:]:
-                fastss.add(word)
+    if action in (CREATE, APPEND):
+        with FastSS.open(dbpath, flag) as fastss:
+            for line in fileinput.input(args):
+                line = line.strip()
+                if line:
+                    fastss.add(line)
 
     elif action == QUERY:
-        with FastSS.open(args[0], 'r') as fastss:
-            for word in args[1:]:
+        with FastSS.open(dbpath, 'r') as fastss:
+            for word in args:
                 print(word, fastss.get(word), sep=': ')
