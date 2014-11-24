@@ -24,7 +24,7 @@ except ImportError:
 
 # Constant
 KEY_ENCODING = 'utf8'
-
+PICKLE_PROTOCOL = 2
 
 class FastSS:
     def __init__(self, indexdb):
@@ -71,7 +71,7 @@ class FastSS:
             if key in self.indexdb:
                 value |= pickle.loads(self.indexdb[key])
 
-            self.indexdb[key] = pickle.dumps(value)
+            self.indexdb[key] = pickle.dumps(value, protocol=PICKLE_PROTOCOL)
 
     def get(self, word):
         result = {x: [] for x in range(self.max_dist+1)}
