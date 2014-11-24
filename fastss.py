@@ -10,6 +10,7 @@ from __future__ import print_function
 import dbm
 import pickle
 import locale
+import itertools
 
 KEY_ENCODING = 'utf8'
 
@@ -32,12 +33,13 @@ class FastSS:
         self.close()
 
     @staticmethod
-    def indexkeys(word):
-        res, wlen = {word}, len(word)
+    def indexkeys(word, dist):
+        res = set()
+        indices = tuple(range(len(word)))
 
-        for i in range(wlen):
-            for j in range(i, wlen):
-                key = word[:i] + word[i+1:j] + word[j+1:]
+        for num in range(dist+1):
+            for comb in itertools.combinations(indices, num):
+                key = ''.join(word[idx] for idx in indices if idx not in comb)
                 res.add(key)
 
         return {s.encode(KEY_ENCODING) for s in res}
