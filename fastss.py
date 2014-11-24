@@ -54,6 +54,11 @@ class FastSS:
     def __exit__(self, type, value, traceback):
         self.close()
 
+    def __contains__(self, word):
+        if word in self.indexdb:
+            return word in pickle.loads(self.indexdb[word])
+        return false
+
     @staticmethod
     def indexkeys(word, max_dist):
         res = set()
