@@ -9,12 +9,14 @@ Command-line Usage:
 from __future__ import print_function
 import dbm
 import pickle
+import locale
 
 KEY_ENCODING = 'utf8'
 
 class FastSS:
     def __init__(self, indexdb):
         self.indexdb = indexdb
+        self.locale_encoding = locale.getpreferredencoding()
 
     @classmethod
     def open(cls, dbpath, flag='c'):
@@ -41,6 +43,9 @@ class FastSS:
         return {s.encode(KEY_ENCODING) for s in res}
 
     def add(self, word):
+        if isinstance(word, bytes):
+            word = word.decode(self.locale_encoding)
+
         for key in self.indexkeys(word):
             value = {word}
 
@@ -52,6 +57,9 @@ class FastSS:
     def get(self, word):
         result = ([], [], [])
         candidate = set()
+
+        if isinstance(word, bytes):
+            word = word.decode(self.locale_encoding)
 
         for key in self.indexkeys(word):
             if key in self.indexdb:
