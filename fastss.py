@@ -7,19 +7,29 @@ Command-line Usage:
 """
 
 from __future__ import print_function
-import dbm
-import pickle
 import locale
 import struct
 import itertools
 
+# For Python 2.X compatibility
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
+try:
+    import anydbm as dbm
+except ImportError:
+    import dbm
+
+# Constant
 KEY_ENCODING = 'utf8'
+
 
 class FastSS:
     def __init__(self, indexdb):
         self.indexdb = indexdb
         self.max_dist = struct.unpack('B', indexdb['__dist__'])[0]
-        self.locale_encoding = locale.getpreferredencoding()
 
     @classmethod
     def open(cls, dbpath, flag='c', max_dist=2):
@@ -53,7 +63,7 @@ class FastSS:
 
     def add(self, word):
         if isinstance(word, bytes):
-            word = word.decode(self.locale_encoding)
+            word = word.decode(locale.getpreferredencoding())
 
         for key in self.indexkeys(word, self.max_dist):
             value = {word}
@@ -68,7 +78,7 @@ class FastSS:
         candidate = set()
 
         if isinstance(word, bytes):
-            word = word.decode(self.locale_encoding)
+            word = word.decode(locale.getpreferredencoding())
 
         for key in self.indexkeys(word, self.max_dist):
             if key in self.indexdb:
