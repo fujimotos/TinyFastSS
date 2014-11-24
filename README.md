@@ -1,10 +1,26 @@
 TinyFastSS
 ==========
 
-A simple implementation of FastSS
+An index data structure for approximate string search.
 
-Design Issues
--------------
+What is (Tiny)FastSS?
+---------------------
+
+[FastSS](http://fastss.csg.uzh.ch/) is an efficient indexing data structure
+for string similarity search, invented by researchers at Zurich University
+in 2007.
+
+TinyFastSS is a simple implementation of FastSS, written in pure Python.
+
+### Features
+
+* Fast, exhaustive retrieval of similar words (in terms of Levenshtein
+  distance) in a dictionary.
+* Very large index size. The output index data might well get 100x larger
+  than the original input data.
+
+Implementation Notes
+--------------------
 
 ### 1. Data Persistence
 
@@ -27,3 +43,4 @@ Some points to consider:
 * Pickle bytestream is incompatible among Python versions. We might
   avoid compatibility issues by using protocol version 2 or below.
 * JSON cannot serialize Python set objects.
+
