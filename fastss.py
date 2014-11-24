@@ -120,6 +120,7 @@ if __name__ == '__main__':
     import getopt
     import sys
     import fileinput
+    import json
 
     CREATE, APPEND, QUERY = 1, 2, 3
     dbpath, action, flag = None, None, None
@@ -150,4 +151,5 @@ if __name__ == '__main__':
     elif action == QUERY:
         with FastSS.open(dbpath, 'r') as fastss:
             for word in args:
-                print(word, fastss.get(word), sep=': ')
+                result = (word, fastss.get(word))
+                print(json.dumps(result))
