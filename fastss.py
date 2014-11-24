@@ -18,15 +18,15 @@ KEY_ENCODING = 'utf8'
 class FastSS:
     def __init__(self, indexdb):
         self.indexdb = indexdb
-        self.dist = struct.unpack('B', indexdb['__dist__'])[0]
+        self.max_dist = struct.unpack('B', indexdb['__dist__'])[0]
         self.locale_encoding = locale.getpreferredencoding()
 
     @classmethod
-    def open(cls, dbpath, flag='c', dist=2):
+    def open(cls, dbpath, flag='c', max_dist=2):
         indexdb = dbm.open(dbpath, flag)
 
         if b'__dist__' not in indexdb:
-            indexdb[b'__dist__'] = struct.pack('B', dist)
+            indexdb[b'__dist__'] = struct.pack('B', max_dist)
 
         return cls(indexdb)
 
@@ -40,11 +40,11 @@ class FastSS:
         self.close()
 
     @staticmethod
-    def indexkeys(word, dist):
+    def indexkeys(word, max_dist):
         res = set()
         indices = tuple(range(len(word)))
 
-        for num in range(dist+1):
+        for num in range(max_dist+1):
             for comb in itertools.combinations(indices, num):
                 key = ''.join(word[idx] for idx in indices if idx not in comb)
                 res.add(key)
@@ -55,7 +55,7 @@ class FastSS:
         if isinstance(word, bytes):
             word = word.decode(self.locale_encoding)
 
-        for key in self.indexkeys(word, self.dist):
+        for key in self.indexkeys(word, self.max_dist):
             value = {word}
 
             if key in self.indexdb:
@@ -64,19 +64,19 @@ class FastSS:
             self.indexdb[key] = pickle.dumps(value)
 
     def get(self, word):
-        result = {x: [] for x in range(self.dist+1)}
+        result = {x: [] for x in range(self.max_dist+1)}
         candidate = set()
 
         if isinstance(word, bytes):
             word = word.decode(self.locale_encoding)
 
-        for key in self.indexkeys(word, self.dist):
+        for key in self.indexkeys(word, self.max_dist):
             if key in self.indexdb:
                 candidate.update(pickle.loads(self.indexdb[key]))
 
         for cand in candidate:
             dist = editdist(word, cand)
-            if dist <= self.dist:
+            if dist <= self.max_dist:
                 result[dist].append(cand)
 
         return result

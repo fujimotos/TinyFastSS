@@ -24,7 +24,7 @@ class TestWriteGzip(unittest.TestCase):
     def test_create_database(self):
         dbpath = os.path.join(self.tmpdir, self.DBNAME)
 
-        with FastSS.open(dbpath, 'n', dist=2) as fastss:
+        with FastSS.open(dbpath, 'n', max_dist=2) as fastss:
             fastss.add('test')
 
         with FastSS.open(dbpath, 'r') as fastss:
