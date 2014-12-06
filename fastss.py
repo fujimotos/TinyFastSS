@@ -98,7 +98,7 @@ class FastSS:
 
             self.indexdb[key] = pickle.dumps(value - {word})
 
-    def get(self, word):
+    def query(self, word):
         result = {x: [] for x in range(self.max_dist+1)}
         candidate = set()
 
@@ -171,5 +171,5 @@ if __name__ == '__main__':
     elif action == QUERY:
         with FastSS.open(dbpath, 'r') as fastss:
             for word in args:
-                result = (word, fastss.get(word))
+                result = (word, fastss.query(word))
                 print(json.dumps(result))

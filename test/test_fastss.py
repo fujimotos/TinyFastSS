@@ -35,7 +35,7 @@ class TestManipulateDB(unittest.TestCase):
             for word in word_set:
                 fastss.add(word)
 
-            res = fastss.get('1')
+            res = fastss.query('1')
             self.assertEqual(set(res[0]), {'1'})
             self.assertEqual(set(res[1]), {'0', '01', '10', '11'})
             self.assertEqual(set(res[2]), {'111', '001', '010', '100', '011', '101', '110', '00'})
@@ -55,7 +55,7 @@ class TestManipulateDB(unittest.TestCase):
             fastss.remove('01')
             fastss.remove('001')
 
-            res = fastss.get('1')
+            res = fastss.query('1')
             self.assertEqual(set(res[0]), set())
             self.assertEqual(set(res[1]), {'0', '10', '11'})
             self.assertEqual(set(res[2]), {'111', '010', '100', '011', '101', '110', '00'})
