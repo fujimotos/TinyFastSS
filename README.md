@@ -1,23 +1,31 @@
 TinyFastSS
 ==========
 
-An index data structure for approximate string search.
-
-What is (Tiny)FastSS?
----------------------
-
 [FastSS](http://fastss.csg.uzh.ch/) is an efficient indexing data structure
 for string similarity search, invented by researchers at Zurich University
 in 2007.
 
-TinyFastSS is a simple implementation of FastSS, written in pure Python.
+TinyFastSS is a simple Python implementation of FastSS, written in less than
+300 LoC.
 
-### Features
 
-* Fast, exhaustive retrieval of similar words (in terms of Levenshtein
-  distance) in a dictionary.
-* Very large index size. The output index data might well get 100x larger
-  than the original input data.
+Introduction (draft)
+--------------------
+
+Suppose you have a large English dictionary, say with more than 1,000,000
+words, and want to implement a fancy spell checker based on it. The first
+thing you need to do is to find out a way to get the list of 'similar'
+entries to an input word.
+
+The most obvious way to do this is to go through the whole dictionary and
+compare each entry against the input string. This is really simple to implement,
+but your program would require (number-of-words x 1 million) computations
+to perform a single spell-checking task for your documents.
+
+TinyFastSS solves this problem by creating a special index file on disk.
+This index data allows you to retrieve all the similar words within a distance
+of *k* (you can specify this value when you create a new index file) in
+an astonishingly fast manner.
 
 Implementation Notes
 --------------------
@@ -35,12 +43,11 @@ are passed, it tried to decode them using the locale encoding.
 
 ### 3. Save format (a.k.a. JSON vs Pickle)
 
-The native Pickle module is slower to encode/decode than the json module.
-(Although, cPickle is much comparable)
-
 Some points to consider:
 
-* Pickle bytestream is incompatible among Python versions. We might
-  avoid compatibility issues by using protocol version 2 or below.
-* JSON cannot serialize Python set objects.
-
+* The pure-python Pickle module is really slow, while cPickle is much
+  comparable in speed to the json module.
+* Pickle bytestream is incompatible among Python versions, while JSON is
+  language independent.
+* JSON cannot serialize some Python objects (most crucial here is the set
+  objects).
