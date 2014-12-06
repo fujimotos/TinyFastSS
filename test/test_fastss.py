@@ -5,7 +5,7 @@ import itertools
 import shutil
 from fastss import FastSS
 
-class TestWriteGzip(unittest.TestCase):
+class TestManipulateDB(unittest.TestCase):
     DBNAME = 'test.dat'
 
     def setUp(self):
@@ -13,24 +13,6 @@ class TestWriteGzip(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.tmpdir)
-
-    def test_indexkeys(self):
-        keys = FastSS.indexkeys('test', 1)
-        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes'})
-
-        keys = FastSS.indexkeys('test', 2)
-        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
-                                b'st', b'et', b'es', b'tt', b'ts', b'te'})
-
-        keys = FastSS.indexkeys('test', 3)
-        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
-                                b'st', b'et', b'es', b'tt', b'ts', b'te',
-                                b't', b'e', b's', b't'})
-
-        keys = FastSS.indexkeys('test', 4)
-        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
-                                b'st', b'et', b'es', b'tt', b'ts', b'te',
-                                b't', b'e', b's', b't', b''})
 
     def test_create_database(self):
         dbpath = os.path.join(self.tmpdir, self.DBNAME)
@@ -57,6 +39,26 @@ class TestWriteGzip(unittest.TestCase):
             self.assertEqual(set(res[0]), {'1'})
             self.assertEqual(set(res[1]), {'0', '01', '10', '11'})
             self.assertEqual(set(res[2]), {'111', '001', '010', '100', '011', '101', '110', '00'})
+
+
+class TestCreateIndex(unittest.TestCase):
+    def test_indexkeys(self):
+        keys = FastSS.indexkeys('test', 1)
+        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes'})
+
+        keys = FastSS.indexkeys('test', 2)
+        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
+                                b'st', b'et', b'es', b'tt', b'ts', b'te'})
+
+        keys = FastSS.indexkeys('test', 3)
+        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
+                                b'st', b'et', b'es', b'tt', b'ts', b'te',
+                                b't', b'e', b's', b't'})
+
+        keys = FastSS.indexkeys('test', 4)
+        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
+                                b'st', b'et', b'es', b'tt', b'ts', b'te',
+                                b't', b'e', b's', b't', b''})
 
 if __name__ == '__main__':
     unittest.main()
