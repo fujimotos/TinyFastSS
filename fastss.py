@@ -88,15 +88,13 @@ class FastSS:
             word = word.decode(locale.getpreferredencoding())
 
         for key in self.indexkeys(word, self.max_dist):
-            if key not in self.indexdb:
-                raise KeyError(word)
+            try:
+                value = pickle.loads(self.indexdb[key])
+                value.remove(word)
+            except KeyError:
+                raise KeyError(word) # Maybe we should add 'from None' here.
 
-            value = pickle.loads(self.indexdb[key])
-
-            if word not in value:
-                raise KeyError(word)
-
-            self.indexdb[key] = pickle.dumps(value - {word})
+            self.indexdb[key] = pickle.dumps(value)
 
     def query(self, word):
         result = {x: [] for x in range(self.max_dist+1)}
