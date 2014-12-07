@@ -136,7 +136,7 @@ def editdist(s, t):
 
     return matrix[(i, j)]
 
-# Enable a siimpler interface;
+# Enable a simple interface;
 # >>> import fastss
 # >>> fastss.open('/path/to/dbm', 'n')
 builtin_open = open
