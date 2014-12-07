@@ -8,6 +8,7 @@ in 2007.
 TinyFastSS is a simple Python implementation of FastSS, written in less than
 300 LoC.
 
+
 Introduction
 ------------
 
@@ -26,6 +27,16 @@ TinyFastSS solves this problem by creating a special index file on disk.
 This index data allows you to retrieve all the similar words within a distance
 of *k* (you can specify this value when you create a new index file) in
 an astonishingly fast manner.
+
+
+Installation
+------------
+
+* Python 3.3 or later recommended (Python 2.7 is also supported)
+* Download the source code and run 'setup.py':
+
+    $ python setup.py install
+
 
 How to use
 ----------
