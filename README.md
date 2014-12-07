@@ -8,24 +8,28 @@ in 2007.
 TinyFastSS is a simple Python implementation of FastSS, written in less than
 300 LoC.
 
+Introduction
+------------
 
-Introduction (draft)
---------------------
-
-Suppose you have a large English dictionary, say with more than 1,000,000
-words, and want to implement a fancy spell checker based on it. The first
+Suppose you have a large English dictionary, say with 1,000,000 words,
+and want to implement a fancy spell checker based on it. The first
 thing you need to do is to find out a way to get the list of 'similar'
 entries to an input word.
 
 The most obvious way to do this is to go through the whole dictionary and
 compare each entry against the input string. This is really simple to implement,
 but your program would require (number-of-words x 1 million) computations
-to perform a single spell-checking task for your documents.
+to perform a single spell-checking task for your documents. This easily
+leads to a real performance problem.
 
 TinyFastSS solves this problem by creating a special index file on disk.
 This index data allows you to retrieve all the similar words within a distance
 of *k* (you can specify this value when you create a new index file) in
 an astonishingly fast manner.
+
+How to use
+----------
+
 
 Implementation Notes
 --------------------
