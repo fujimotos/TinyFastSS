@@ -29,7 +29,8 @@ except ImportError:
 
 # Constant
 KEY_ENCODING = 'utf8'
-PICKLE_PROTOCOL = 2
+PICKLE_PROTOCOL = 2  # The pickle protocol version 2 is the highest
+                     # one which Python 2.X can handle.
 
 class FastSS:
     def __init__(self, indexdb):
