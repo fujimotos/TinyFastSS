@@ -3,7 +3,7 @@ import os
 import tempfile
 import itertools
 import shutil
-from fastss import FastSS
+from fastss import FastSS, editdist
 
 class TestManipulateDB(unittest.TestCase):
     DBNAME = 'test.dat'
@@ -90,6 +90,18 @@ class TestCreateIndex(unittest.TestCase):
         self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
                                 b'st', b'et', b'es', b'tt', b'ts', b'te',
                                 b't', b'e', b's', b't', b''})
+
+class TestEditDistance(unittest.TestCase):
+    def test_editdist(self):
+        test_case = (
+            {'10'},
+            {'0', '1', '00', '11', '010', '100', '101', '110'},
+            {'', '01', '000', '001', '011', '111'}
+        )
+
+        for dist, word_set in enumerate(test_case):
+            for word in word_set:
+                self.assertEqual(editdist(word, '10'), dist)
 
 if __name__ == '__main__':
     unittest.main()
