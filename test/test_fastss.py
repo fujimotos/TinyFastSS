@@ -74,19 +74,19 @@ class TestManipulateDB(unittest.TestCase):
 
 class TestCreateIndex(unittest.TestCase):
     def test_indexkeys(self):
-        keys = FastSS.indexkeys('test', 1)
+        keys = FastSS.indexkeys(u'test', 1)
         self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes'})
 
-        keys = FastSS.indexkeys('test', 2)
+        keys = FastSS.indexkeys(u'test', 2)
         self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
                                 b'st', b'et', b'es', b'tt', b'ts', b'te'})
 
-        keys = FastSS.indexkeys('test', 3)
+        keys = FastSS.indexkeys(u'test', 3)
         self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
                                 b'st', b'et', b'es', b'tt', b'ts', b'te',
                                 b't', b'e', b's', b't'})
 
-        keys = FastSS.indexkeys('test', 4)
+        keys = FastSS.indexkeys(u'test', 4)
         self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
                                 b'st', b'et', b'es', b'tt', b'ts', b'te',
                                 b't', b'e', b's', b't', b''})
@@ -94,14 +94,14 @@ class TestCreateIndex(unittest.TestCase):
 class TestEditDistance(unittest.TestCase):
     def test_editdist(self):
         test_case = (
-            {'10'},
-            {'0', '1', '00', '11', '010', '100', '101', '110'},
-            {'', '01', '000', '001', '011', '111'}
+            {u'10'},
+            {u'0', u'1', u'00', u'11', u'010', u'100', u'101', u'110'},
+            {u'', u'01', u'000', u'001', u'011', u'111'}
         )
 
         for dist, word_set in enumerate(test_case):
             for word in word_set:
-                self.assertEqual(editdist(word, '10'), dist)
+                self.assertEqual(editdist(word, u'10'), dist)
 
 if __name__ == '__main__':
     unittest.main()
