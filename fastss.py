@@ -27,6 +27,11 @@ try:
 except ImportError:
     import dbm
 
+try:
+    unicode
+except NameError: # Python 3.X
+    unicode = str
+
 # Constant
 KEY_ENCODING = 'utf8'
 PICKLE_PROTOCOL = 2  # The pickle protocol version 2 is the highest
@@ -62,6 +67,8 @@ class FastSS:
 
     @staticmethod
     def indexkeys(word, max_dist):
+        assert isinstance(word, unicode)
+
         res = set()
         indices = tuple(range(len(word)))
 
@@ -118,6 +125,8 @@ class FastSS:
 
 def editdist(s, t):
     """Calculate Levenshtein distance between two strings"""
+
+    assert isinstance(s, unicode) and isinstance(t, unicode)
 
     matrix = {}
     for i in range(len(s)+1):
