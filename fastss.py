@@ -156,21 +156,6 @@ class FastSS:
 
             self.index[bkey] = pickle.dumps(value, protocol=PICKLE_PROTOCOL)
 
-    def remove(self, word):
-        if isinstance(word, bytes):
-            word = word.decode(locale.getpreferredencoding())
-
-        for key in indexkeys(word, self.max_dist):
-            bkey = key.encode(KEY_ENCODING)
-
-            try:
-                value = pickle.loads(self.index[bkey])
-                value.remove(word)
-            except KeyError:
-                raise KeyError(word) # Maybe we should add 'from None' here.
-
-            self.index[bkey] = pickle.dumps(value)
-
     def query(self, word):
         result = {x: [] for x in range(self.max_dist+1)}
         candidate = set()
