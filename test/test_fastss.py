@@ -4,7 +4,9 @@ import tempfile
 import itertools
 import shutil
 
-from fastss import FastSS, editdist, indexkeys, int2byte, byte2int
+from fastss import (
+    FastSS, editdist, indexkeys, int2byte, byte2int, set2bytes, bytes2set
+)
 
 
 class TestFastSS(unittest.TestCase):
@@ -83,6 +85,22 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(byte2int(b'\x01'), 1)
         self.assertEqual(byte2int(b'\x10'), 16)
         self.assertEqual(byte2int(b'\xff'), 255)
+
+    def test_set2byte(self):
+        self.assertEqual(set2bytes({}), b'')
+        self.assertEqual(set2bytes({'a', 'b', 'c'}), b'a\x00b\x00c')
+        self.assertEqual(
+            set2bytes({u'\u3042', u'\u3043'}),
+            b'\xe3\x81\x82\x00\xe3\x81\x83'
+        )
+
+    def test_byte2set(self):
+        self.assertEqual(bytes2set(b''), set())
+        self.assertEqual(bytes2set(b'a\x00b\x00c'), {'a', 'b', 'c'})
+        self.assertEqual(
+            bytes2set(b'\xe3\x81\x82\x00\xe3\x81\x83'),
+            {u'\u3042', u'\u3043'}
+        )
 
 if __name__ == '__main__':
     unittest.main()
