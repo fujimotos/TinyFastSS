@@ -14,23 +14,15 @@ from __future__ import print_function
 import struct
 import itertools
 
-#
-# Python 2.X compatibility
 try:
     import anydbm as dbm
 except ImportError:
     import dbm
 
-try:
-    unicode
-except NameError:
-    unicode = str
-
 
 #
 # Constants
 
-PICKLE_PROTOCOL = 2  # The highest version with Python 2 support.
 ENCODING = 'utf-8'
 MAXDIST_KEY = b'__maxdist__'
 DELIMITER = b'\x00'
@@ -171,35 +163,35 @@ class FastSS:
     def add(self, word):
         for key in indexkeys(word, self.max_dist):
             bkey = key.encode(ENCODING)
-            value = {word}
+            wordset = {word}
 
             if bkey in self.db:
-                value |= bytes2set(self.db[bkey])
+                wordset |= bytes2set(self.db[bkey])
 
-            self.db[bkey] = set2bytes(value)
+            self.db[bkey] = set2bytes(wordset)
 
     def query(self, word):
-        result = {x: [] for x in range(self.max_dist+1)}
-        candidate = set()
+        res = {d: [] for d in range(self.max_dist+1)}
+        cands = set()
 
         for key in indexkeys(word, self.max_dist):
             bkey = key.encode(ENCODING)
 
             if bkey in self.db:
-                candidate.update(bytes2set(self.db[bkey]))
+                cands.update(bytes2set(self.db[bkey]))
 
-        for cand in candidate:
+        for cand in cands:
             dist = editdist(word, cand)
             if dist <= self.max_dist:
-                result[dist].append(cand)
+                res[dist].append(cand)
 
-        return result
+        return res
 
 
 # Enable a simple interface;
 # >>> import fastss
 # >>> fastss.open('/path/to/dbm', 'n')
-builtin_open = open
+_builtin_open = open
 open = FastSS.open
 
 if __name__ == '__main__':
@@ -208,7 +200,7 @@ if __name__ == '__main__':
     import fileinput
     import json
 
-    CREATE, UPDATE, QUERY = 1, 2, 3
+    CREATE, QUERY = 1, 2
     path, action, flag = None, None, None
     max_dist = 2
 
@@ -235,5 +227,5 @@ if __name__ == '__main__':
     elif action == QUERY:
         with FastSS.open(path, 'r') as fastss:
             for word in args:
-                result = (word, fastss.query(word))
-                print(json.dumps(result))
+                res = fastss.query(word)
+                print(json.dumps(res))
