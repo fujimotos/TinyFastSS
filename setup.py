@@ -2,10 +2,10 @@ from distutils.core import setup
 
 setup(
     name='TinyFastSS',
-    version='v1.0.1',
+    version='v2.0.0',
     py_modules=['fastss'],
     author='Fujimoto Seiji',
-    author_email='fujimoto@writingarchives.sakura.ne.jp',
+    author_email='fujimoto@ceptord.net',
     url='https://github.com/fujimotos/TinyFastSS',
     description='An efficient indexing data structure for string similarity search',
     classifiers=[
