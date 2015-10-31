@@ -9,60 +9,57 @@ TinyFastSS is a simple Python implementation of FastSS, written in less than
 300 LoC.
 
 
-Introduction
-------------
+Features
+--------
 
-Suppose you have a large English dictionary, say with 100,000 words,
-and want to implement a fancy spell checker based on it. The first
-thing you need to do is to find out a way to get the list of 'similar'
-entries to an input word.
-
-The most obvious way to do this is to go through the whole dictionary and
-compare each entry against the input string. This is really simple to implement,
-but your program would require (number-of-words x 100,000) computations
-to perform a single spell-checking task for your documents. This easily
-leads to a real performance problem.
-
-TinyFastSS solves this problem by creating a special index file on disk.
-This index data allows you to retrieve all the similar words within a distance
-of *k* (you can specify this value when you create a new index file) in
-an astonishingly fast manner.
+* Create a FastSS index on disk.
+* Perform very fast fuzzy searches using the index file.
+* Python 2/3 compatible (tested with Python 2.7 / 3.4)
+* No external modules required (only dependent on built-in modules)
 
 
-Installation
-------------
+How to install
+--------------
 
-* Python 3.3 or later recommended (Python 2.7 is also supported)
-* Download the source code and run 'setup.py':
+Clone the source code and run 'setup.py':
 
     $ python setup.py install
 
 
-How to use
-----------
+Basic usage
+-----------
+
+### 1. Create an index file.
+
+```python
+import fastss
+
+with fastss.open('fastss.dat') as index:
+    for word in open('dictonary.txt'):
+        index.add(word.strip())
+```
+
+### 2. Perform a fuzzy string search.
+
+```python
+import fastss
+
+with fastss.open('fastss.dat') as index:
+    # return a dict like: {0: ['test'], 1: ['text', 'west'], 2: ['taft']}
+    print(index.query('test'))
+```
 
 
-Implementation Notes
+Implementation notes
 --------------------
 
-### 1. Data Persistence
+TinyFastSS uses built-in module dbm (anydbm) to store the index data.
 
-Currently, FastSS uses dbm(anydbm) module to store the index data.
-However, on some platforms, Python only supports 'dbm.dumb' which is
-100x slower than gdbm and (seemingly) contains several bugs.
+A "index file" is basically a (disk-based) hash table which maps a key
+(read the original paper to know what a 'key' means) to a list of words.
 
-### 2. Input data
+As dbm can only store bytes, both keys and words are encoded in UTF-8,
+and each word-list is serialized into a byte string delimited by null
+bytes (b'\x00'). Here is an example of a (key, value) pair:
 
-FastSS only accepts unicode strings. If bytes (or 'str' in Python 2)
-are passed, it tried to decode them using the locale encoding.
-
-### 3. Save format (a.k.a. JSON vs Pickle)
-
-Some points to consider:
-
-* The pure-python Pickle module is really slow, while cPickle is much
-  comparable in speed to the json module.
-* Pickle bytestream is incompatible among Python versions, while JSON is
-  language independent.
-* JSON cannot serialize some Python objects (most crucial here is the set
-  objects).
+    (b'almond', b'almond\x00almonds\x00almondy')
