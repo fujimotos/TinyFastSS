@@ -38,8 +38,8 @@ except NameError:
 #
 # Constants
 
-KEY_ENCODING = 'utf8'
 PICKLE_PROTOCOL = 2  # The highest version with Python 2 support.
+KEY_ENCODING = 'utf-8'
 DIST_KEY = b'__dist__'
 
 
