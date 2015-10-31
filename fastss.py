@@ -45,24 +45,26 @@ PICKLE_PROTOCOL = 2  # The highest version with Python 2 support.
 #
 # Utils
 
-def editdist(s, t):
-    """Calculate Levenshtein distance between two strings"""
-
-    assert isinstance(s, unicode) and isinstance(t, unicode)
+def editdist(s1, s2):
+    """Return the Levenshtein distance between two strings"""
 
     matrix = {}
-    for i in range(len(s)+1):
+
+    for i in range(len(s1)+1):
         matrix[(i, 0)] = i
-    for j in range(len(t)+1):
+    for j in range(len(s2)+1):
         matrix[(0, j)] = j
 
-    for j in range(1, len(t)+1):
-        for i in range(1, len(s)+1):
-            if s[i-1] == t[j-1]:
+    for i in range(1, len(s1)+1):
+        for j in range(1, len(s2)+1):
+            if s1[i-1] == s2[j-1]:
                 matrix[(i, j)] = matrix[(i-1, j-1)]
             else:
-                matrix[(i, j)] = min(matrix[(i-1, j)], matrix[(i, j-1)],
-                                     matrix[(i-1, j-1)]) + 1
+                matrix[(i, j)] = min(
+                    matrix[(i-1, j)],
+                    matrix[(i, j-1)],
+                    matrix[(i-1, j-1)]
+                ) + 1
 
     return matrix[(i, j)]
 
