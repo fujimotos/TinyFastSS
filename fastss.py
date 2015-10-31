@@ -114,8 +114,8 @@ class FastSS:
         return false
 
     @classmethod
-    def open(cls, dbpath, flag='c', max_dist=2):
-        index = dbm.open(dbpath, flag)
+    def open(cls, path, flag='c', max_dist=2):
+        index = dbm.open(path, flag)
 
         if DIST_KEY not in index:
             index[DIST_KEY] = struct.pack('B', max_dist)
@@ -187,33 +187,33 @@ if __name__ == '__main__':
     import json
 
     CREATE, UPDATE, QUERY = 1, 2, 3
-    dbpath, action, flag = None, None, None
+    path, action, flag = None, None, None
     max_dist = 2
 
     opts, args = getopt.getopt(sys.argv[1:], 'c:u:q:', 'maxdist=')
     for key, val in opts:
         if key == '-c':
-            dbpath, action, flag = val, CREATE, 'n'
+            path, action, flag = val, CREATE, 'n'
         elif key == '-u':
-            dbpath, action, flag = val, UPDATE, 'c'
+            path, action, flag = val, UPDATE, 'c'
         elif key == "-q":
-            dbpath, action, flag = val, QUERY, 'r'
+            path, action, flag = val, QUERY, 'r'
         elif key == "--maxdist":
             max_dist = int(val)
 
-    if action is None or dbpath is None:
+    if action is None or path is None:
         print(__doc__, file=sys.stderr)
         sys.exit(1)
 
     if action in (CREATE, UPDATE):
-        with FastSS.open(dbpath, flag, max_dist) as fastss:
+        with FastSS.open(path, flag, max_dist) as fastss:
             for line in fileinput.input(args):
                 line = line.strip()
                 if line:
                     fastss.add(line)
 
     elif action == QUERY:
-        with FastSS.open(dbpath, 'r') as fastss:
+        with FastSS.open(path, 'r') as fastss:
             for word in args:
                 result = (word, fastss.query(word))
                 print(json.dumps(result))
