@@ -98,9 +98,9 @@ def indexkeys(word, max_dist):
 # FastSS class
 
 class FastSS:
-    def __init__(self, indexdb):
-        self.indexdb = indexdb
-        self.max_dist = struct.unpack('B', indexdb[DIST_KEY])[0]
+    def __init__(self, index):
+        self.index = index
+        self.max_dist = struct.unpack('B', index[DIST_KEY])[0]
 
     def __enter__(self):
         return self
@@ -109,21 +109,21 @@ class FastSS:
         self.close()
 
     def __contains__(self, word):
-        if word in self.indexdb:
-            return word in pickle.loads(self.indexdb[word])
+        if word in self.index:
+            return word in pickle.loads(self.index[word])
         return false
 
     @classmethod
     def open(cls, dbpath, flag='c', max_dist=2):
-        indexdb = dbm.open(dbpath, flag)
+        index = dbm.open(dbpath, flag)
 
-        if DIST_KEY not in indexdb:
-            indexdb[DIST_KEY] = struct.pack('B', max_dist)
+        if DIST_KEY not in index:
+            index[DIST_KEY] = struct.pack('B', max_dist)
 
-        return cls(indexdb)
+        return cls(index)
 
     def close(self):
-        self.indexdb.close()
+        self.index.close()
 
     def add(self, word):
         if isinstance(word, bytes):
@@ -133,10 +133,10 @@ class FastSS:
             bkey = key.encode(KEY_ENCODING)
             value = {word}
 
-            if bkey in self.indexdb:
-                value |= pickle.loads(self.indexdb[bkey])
+            if bkey in self.index:
+                value |= pickle.loads(self.index[bkey])
 
-            self.indexdb[bkey] = pickle.dumps(value, protocol=PICKLE_PROTOCOL)
+            self.index[bkey] = pickle.dumps(value, protocol=PICKLE_PROTOCOL)
 
     def remove(self, word):
         if isinstance(word, bytes):
@@ -146,12 +146,12 @@ class FastSS:
             bkey = key.encode(KEY_ENCODING)
 
             try:
-                value = pickle.loads(self.indexdb[bkey])
+                value = pickle.loads(self.index[bkey])
                 value.remove(word)
             except KeyError:
                 raise KeyError(word) # Maybe we should add 'from None' here.
 
-            self.indexdb[bkey] = pickle.dumps(value)
+            self.index[bkey] = pickle.dumps(value)
 
     def query(self, word):
         result = {x: [] for x in range(self.max_dist+1)}
@@ -163,8 +163,8 @@ class FastSS:
         for key in indexkeys(word, self.max_dist):
             bkey = key.encode(KEY_ENCODING)
 
-            if bkey in self.indexdb:
-                candidate.update(pickle.loads(self.indexdb[bkey]))
+            if bkey in self.index:
+                candidate.update(pickle.loads(self.index[bkey]))
 
         for cand in candidate:
             dist = editdist(word, cand)
