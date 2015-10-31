@@ -1,14 +1,14 @@
 """A simple implementation of FastSS
 
-Command-line Usage:
+Command-line usage:
 
-  fastss.py -c database.dat filepath - Create new database with input stream.
-  fastss.py -u database.dat filepath - Update database using input stream.
-  fastss.py -q database.dat string   - Query database with string.
+  fastss.py -c index.dat filepath - Create a new index file.
+  fastss.py -u index.dat filepath - Update the existing index.
+  fastss.py -q index.dat string   - Query the index with <string>.
 
-Create Options:
+Create mode options:
 
-  --maxdist <N> - Maximum edit distance for the database (default: 2)
+  --maxdist <N> - Maximum edit distance for the index (default: 2)
 """
 
 from __future__ import print_function
@@ -16,7 +16,9 @@ import locale
 import struct
 import itertools
 
-# For Python 2.X compatibility
+#
+# Python 2.X compatibility
+
 try:
     import cPickle as pickle
 except ImportError:
@@ -29,13 +31,44 @@ except ImportError:
 
 try:
     unicode
-except NameError: # Python 3.X
+except NameError:
     unicode = str
 
-# Constant
+
+#
+# Constants
+
 KEY_ENCODING = 'utf8'
-PICKLE_PROTOCOL = 2  # The pickle protocol version 2 is the highest
-                     # one which Python 2.X can handle.
+PICKLE_PROTOCOL = 2  # The highest version with Python 2 support.
+
+
+#
+# Utils
+
+def editdist(s, t):
+    """Calculate Levenshtein distance between two strings"""
+
+    assert isinstance(s, unicode) and isinstance(t, unicode)
+
+    matrix = {}
+    for i in range(len(s)+1):
+        matrix[(i, 0)] = i
+    for j in range(len(t)+1):
+        matrix[(0, j)] = j
+
+    for j in range(1, len(t)+1):
+        for i in range(1, len(s)+1):
+            if s[i-1] == t[j-1]:
+                matrix[(i, j)] = matrix[(i-1, j-1)]
+            else:
+                matrix[(i, j)] = min(matrix[(i-1, j)], matrix[(i, j-1)],
+                                     matrix[(i-1, j-1)]) + 1
+
+    return matrix[(i, j)]
+
+
+#
+# FastSS class
 
 class FastSS:
     def __init__(self, indexdb):
@@ -122,27 +155,6 @@ class FastSS:
 
         return result
 
-
-def editdist(s, t):
-    """Calculate Levenshtein distance between two strings"""
-
-    assert isinstance(s, unicode) and isinstance(t, unicode)
-
-    matrix = {}
-    for i in range(len(s)+1):
-        matrix[(i, 0)] = i
-    for j in range(len(t)+1):
-        matrix[(0, j)] = j
-
-    for j in range(1, len(t)+1):
-        for i in range(1, len(s)+1):
-            if s[i-1] == t[j-1]:
-                matrix[(i, j)] = matrix[(i-1, j-1)]
-            else:
-                matrix[(i, j)] = min(matrix[(i-1, j)], matrix[(i, j-1)],
-                                     matrix[(i-1, j-1)]) + 1
-
-    return matrix[(i, j)]
 
 # Enable a simple interface;
 # >>> import fastss
