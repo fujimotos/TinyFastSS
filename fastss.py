@@ -3,7 +3,6 @@
 Command-line usage:
 
   fastss.py -c index.dat filepath - Create a new index file.
-  fastss.py -u index.dat filepath - Update the existing index.
   fastss.py -q index.dat string   - Query the index with <string>.
 
 Create mode options:
@@ -193,12 +192,10 @@ if __name__ == '__main__':
     path, action, flag = None, None, None
     max_dist = 2
 
-    opts, args = getopt.getopt(sys.argv[1:], 'c:u:q:', 'maxdist=')
+    opts, args = getopt.getopt(sys.argv[1:], 'c:q:', 'maxdist=')
     for key, val in opts:
         if key == '-c':
             path, action, flag = val, CREATE, 'n'
-        elif key == '-u':
-            path, action, flag = val, UPDATE, 'c'
         elif key == "-q":
             path, action, flag = val, QUERY, 'r'
         elif key == "--maxdist":
@@ -208,7 +205,7 @@ if __name__ == '__main__':
         print(__doc__, file=sys.stderr)
         sys.exit(1)
 
-    if action in (CREATE, UPDATE):
+    if action == CREATE:
         with FastSS.open(path, flag, max_dist) as fastss:
             for line in fileinput.input(args):
                 line = line.strip()
