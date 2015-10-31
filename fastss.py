@@ -40,6 +40,7 @@ except NameError:
 
 KEY_ENCODING = 'utf8'
 PICKLE_PROTOCOL = 2  # The highest version with Python 2 support.
+DIST_KEY = b'__dist__'
 
 
 #
@@ -99,7 +100,7 @@ def indexkeys(word, max_dist):
 class FastSS:
     def __init__(self, indexdb):
         self.indexdb = indexdb
-        self.max_dist = struct.unpack('B', indexdb['__dist__'])[0]
+        self.max_dist = struct.unpack('B', indexdb[DIST_KEY])[0]
 
     def __enter__(self):
         return self
@@ -116,8 +117,8 @@ class FastSS:
     def open(cls, dbpath, flag='c', max_dist=2):
         indexdb = dbm.open(dbpath, flag)
 
-        if b'__dist__' not in indexdb:
-            indexdb[b'__dist__'] = struct.pack('B', max_dist)
+        if DIST_KEY not in indexdb:
+            indexdb[DIST_KEY] = struct.pack('B', max_dist)
 
         return cls(indexdb)
 
