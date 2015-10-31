@@ -129,7 +129,7 @@ class FastSS:
     def __contains__(self, word):
         if word in self.index:
             return word in pickle.loads(self.index[word])
-        return false
+        return False
 
     @classmethod
     def open(cls, path, flag='c', max_dist=2):
