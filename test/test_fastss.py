@@ -3,9 +3,11 @@ import os
 import tempfile
 import itertools
 import shutil
-from fastss import FastSS, editdist
 
-class TestManipulateDB(unittest.TestCase):
+from fastss import FastSS, editdist, indexkeys
+
+
+class TestFastSS(unittest.TestCase):
     DBNAME = 'test.dat'
 
     def setUp(self):
@@ -26,29 +28,35 @@ class TestManipulateDB(unittest.TestCase):
 
     def test_add_words(self):
         dbpath = os.path.join(self.tmpdir, self.DBNAME)
-        word_set = ('0', '1', '00', '01', '10', '11', '000', '001', '010', '011',
-                    '100', '101', '110', '111', '0000', '0001', '0010', '0011',
-                    '0100', '0101', '0110', '0111', '1000', '1001', '1010', '1011',
-                    '1100', '1101', '1110', '1111')
+        words = (
+            ('0', '1', '00', '01', '10', '11')
+            + ('000', '001', '010', '011', '100', '101', '110', '111')
+            + ('0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111')
+            + ('1000', '1001', '1010', '1011', '1100', '1101', '1110', '1111')
+        )
 
         with FastSS.open(dbpath, 'n') as fastss:
-            for word in word_set:
+            for word in words:
                 fastss.add(word)
 
             res = fastss.query('1')
             self.assertEqual(set(res[0]), {'1'})
             self.assertEqual(set(res[1]), {'0', '01', '10', '11'})
-            self.assertEqual(set(res[2]), {'111', '001', '010', '100', '011', '101', '110', '00'})
+            self.assertEqual(set(res[2]), {
+                '111', '001', '010', '100', '011', '101', '110', '00'
+            })
 
     def test_remove_words(self):
         dbpath = os.path.join(self.tmpdir, self.DBNAME)
-        word_set = ('0', '1', '00', '01', '10', '11', '000', '001', '010', '011',
-                    '100', '101', '110', '111', '0000', '0001', '0010', '0011',
-                    '0100', '0101', '0110', '0111', '1000', '1001', '1010', '1011',
-                    '1100', '1101', '1110', '1111')
+        words =  (
+            ('0', '1', '00', '01', '10', '11')
+            + ('000', '001', '010', '011', '100', '101', '110', '111')
+            + ('0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111')
+            + ('1000', '1001', '1010', '1011', '1100', '1101', '1110', '1111')
+        )
 
         with FastSS.open(dbpath, 'n') as fastss:
-            for word in word_set:
+            for word in words:
                 fastss.add(word)
 
             fastss.remove('1')
@@ -58,7 +66,9 @@ class TestManipulateDB(unittest.TestCase):
             res = fastss.query('1')
             self.assertEqual(set(res[0]), set())
             self.assertEqual(set(res[1]), {'0', '10', '11'})
-            self.assertEqual(set(res[2]), {'111', '010', '100', '011', '101', '110', '00'})
+            self.assertEqual(set(res[2]), {
+                '111', '010', '100', '011', '101', '110', '00'
+            })
 
     def test_remove_nonexist(self):
         dbpath = os.path.join(self.tmpdir, self.DBNAME)
@@ -72,26 +82,21 @@ class TestManipulateDB(unittest.TestCase):
             with self.assertRaises(KeyError):
                 fastss.remove('otato')
 
-class TestCreateIndex(unittest.TestCase):
+
+class TestUtils(unittest.TestCase):
     def test_indexkeys(self):
-        keys = FastSS.indexkeys(u'test', 1)
-        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes'})
+        keys = indexkeys('aiu', 1)
+        self.assertEqual(keys, {'aiu', 'iu', 'au', 'ai'})
 
-        keys = FastSS.indexkeys(u'test', 2)
-        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
-                                b'st', b'et', b'es', b'tt', b'ts', b'te'})
+        keys = indexkeys('aiu', 2)
+        self.assertEqual(keys, {'aiu', 'iu', 'au', 'ai', 'a', 'i', 'u'})
 
-        keys = FastSS.indexkeys(u'test', 3)
-        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
-                                b'st', b'et', b'es', b'tt', b'ts', b'te',
-                                b't', b'e', b's', b't'})
+        keys = indexkeys('aiu', 3)
+        self.assertEqual(keys, {'aiu', 'iu', 'au', 'ai', 'a', 'i', 'u', ''})
 
-        keys = FastSS.indexkeys(u'test', 4)
-        self.assertEqual(keys, {b'test', b'est', b'tst', b'tet', b'tes',
-                                b'st', b'et', b'es', b'tt', b'ts', b'te',
-                                b't', b'e', b's', b't', b''})
+        keys = indexkeys('aiu', 4)
+        self.assertEqual(keys, indexkeys('aiu', 3))
 
-class TestEditDistance(unittest.TestCase):
     def test_editdist(self):
         test_case = (
             {u'10'},
@@ -102,6 +107,7 @@ class TestEditDistance(unittest.TestCase):
         for dist, word_set in enumerate(test_case):
             for word in word_set:
                 self.assertEqual(editdist(word, u'10'), dist)
+
 
 if __name__ == '__main__':
     unittest.main()
