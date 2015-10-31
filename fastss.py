@@ -16,12 +16,6 @@ import itertools
 
 #
 # Python 2.X compatibility
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
 try:
     import anydbm as dbm
 except ImportError:
@@ -169,9 +163,9 @@ class FastSS:
             value = {word}
 
             if bkey in self.index:
-                value |= pickle.loads(self.index[bkey])
+                value |= bytes2set(self.index[bkey])
 
-            self.index[bkey] = pickle.dumps(value, protocol=PICKLE_PROTOCOL)
+            self.index[bkey] = set2bytes(value)
 
     def query(self, word):
         result = {x: [] for x in range(self.max_dist+1)}
@@ -181,7 +175,7 @@ class FastSS:
             bkey = key.encode(ENCODING)
 
             if bkey in self.index:
-                candidate.update(pickle.loads(self.index[bkey]))
+                candidate.update(bytes2set(self.index[bkey]))
 
         for cand in candidate:
             dist = editdist(word, cand)
