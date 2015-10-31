@@ -38,7 +38,7 @@ except NameError:
 
 PICKLE_PROTOCOL = 2  # The highest version with Python 2 support.
 ENCODING = 'utf-8'
-DIST_KEY = b'__dist__'
+MAXDIST_KEY = b'__maxdist__'
 
 
 #
@@ -116,7 +116,7 @@ def byte2int(b):
 class FastSS:
     def __init__(self, index):
         self.index = index
-        self.max_dist = byte2int(index[DIST_KEY])
+        self.max_dist = byte2int(index[MAXDIST_KEY])
 
     def __enter__(self):
         return self
@@ -128,8 +128,8 @@ class FastSS:
     def open(cls, path, flag='c', max_dist=2):
         index = dbm.open(path, flag)
 
-        if DIST_KEY not in index:
-            index[DIST_KEY] = int2byte(max_dist)
+        if MAXDIST_KEY not in index:
+            index[MAXDIST_KEY] = int2byte(max_dist)
 
         return cls(index)
 
