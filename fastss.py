@@ -94,13 +94,31 @@ def indexkeys(word, max_dist):
     return res
 
 
+def int2byte(i):
+    """Encode a positive int (<= 256) into a 8-bit byte.
+
+    >>> int2byte(1)
+    b'\x01'
+    """
+    return struct.pack('B', i)
+
+
+def byte2int(b):
+    """Decode a 8-bit byte into an integer.
+
+    >>> byte2int(b'\x01')
+    1
+    """
+    return struct.unpack('B', b)[0]
+
+
 #
 # FastSS class
 
 class FastSS:
     def __init__(self, index):
         self.index = index
-        self.max_dist = struct.unpack('B', index[DIST_KEY])[0]
+        self.max_dist = byte2int(index[DIST_KEY])
 
     def __enter__(self):
         return self
@@ -118,7 +136,7 @@ class FastSS:
         index = dbm.open(path, flag)
 
         if DIST_KEY not in index:
-            index[DIST_KEY] = struct.pack('B', max_dist)
+            index[DIST_KEY] = int2byte(max_dist)
 
         return cls(index)
 
