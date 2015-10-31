@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='TinyFastSS',
-    version='20141207',
+    version='v1.0.1',
     py_modules=['fastss'],
     author='Fujimoto Seiji',
     author_email='fujimoto@writingarchives.sakura.ne.jp',
