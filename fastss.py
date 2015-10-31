@@ -69,6 +69,28 @@ def editdist(s1, s2):
     return matrix[(i, j)]
 
 
+def indexkeys(word, max_dist):
+    """Return the set of index keys ("variants") of a word.
+
+    >>> indexkeys('aiu', 1)
+    {'aiu', 'iu', 'au', 'ai'}
+    >>> indexkeys('aiu', 2)
+    {'aiu', 'iu', 'au', 'ai', 'u', 'i', 'a'}
+    """
+
+    res = set()
+    wordlen = len(word)
+    limit = min(max_dist, wordlen) + 1
+
+    for dist in range(limit):
+        variants = itertools.combinations(word, wordlen-dist)
+
+        for variant in variants:
+            res.add(''.join(variant))
+
+    return res
+
+
 #
 # FastSS class
 
@@ -100,44 +122,33 @@ class FastSS:
             return word in pickle.loads(self.indexdb[word])
         return false
 
-    @staticmethod
-    def indexkeys(word, max_dist):
-        assert isinstance(word, unicode)
-
-        res = set()
-        indices = tuple(range(len(word)))
-
-        for num in range(max_dist+1):
-            for comb in itertools.combinations(indices, num):
-                key = ''.join(word[idx] for idx in indices if idx not in comb)
-                res.add(key)
-
-        return {s.encode(KEY_ENCODING) for s in res}
-
     def add(self, word):
         if isinstance(word, bytes):
             word = word.decode(locale.getpreferredencoding())
 
-        for key in self.indexkeys(word, self.max_dist):
+        for key in indexkeys(word, self.max_dist):
+            bkey = key.encode(KEY_ENCODING)
             value = {word}
 
-            if key in self.indexdb:
-                value |= pickle.loads(self.indexdb[key])
+            if bkey in self.indexdb:
+                value |= pickle.loads(self.indexdb[bkey])
 
-            self.indexdb[key] = pickle.dumps(value, protocol=PICKLE_PROTOCOL)
+            self.indexdb[bkey] = pickle.dumps(value, protocol=PICKLE_PROTOCOL)
 
     def remove(self, word):
         if isinstance(word, bytes):
             word = word.decode(locale.getpreferredencoding())
 
-        for key in self.indexkeys(word, self.max_dist):
+        for key in indexkeys(word, self.max_dist):
+            bkey = key.encode(KEY_ENCODING)
+
             try:
-                value = pickle.loads(self.indexdb[key])
+                value = pickle.loads(self.indexdb[bkey])
                 value.remove(word)
             except KeyError:
                 raise KeyError(word) # Maybe we should add 'from None' here.
 
-            self.indexdb[key] = pickle.dumps(value)
+            self.indexdb[bkey] = pickle.dumps(value)
 
     def query(self, word):
         result = {x: [] for x in range(self.max_dist+1)}
@@ -146,9 +157,11 @@ class FastSS:
         if isinstance(word, bytes):
             word = word.decode(locale.getpreferredencoding())
 
-        for key in self.indexkeys(word, self.max_dist):
-            if key in self.indexdb:
-                candidate.update(pickle.loads(self.indexdb[key]))
+        for key in indexkeys(word, self.max_dist):
+            bkey = key.encode(KEY_ENCODING)
+
+            if bkey in self.indexdb:
+                candidate.update(pickle.loads(self.indexdb[bkey]))
 
         for cand in candidate:
             dist = editdist(word, cand)
