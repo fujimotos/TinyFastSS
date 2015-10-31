@@ -4,7 +4,7 @@ import tempfile
 import itertools
 import shutil
 
-from fastss import FastSS, editdist, indexkeys
+from fastss import FastSS, editdist, indexkeys, int2byte, byte2int
 
 
 class TestFastSS(unittest.TestCase):
@@ -84,6 +84,18 @@ class TestFastSS(unittest.TestCase):
 
 
 class TestUtils(unittest.TestCase):
+
+    def test_editdist(self):
+        test_case = (
+            {u'10'},
+            {u'0', u'1', u'00', u'11', u'010', u'100', u'101', u'110'},
+            {u'', u'01', u'000', u'001', u'011', u'111'}
+        )
+
+        for dist, word_set in enumerate(test_case):
+            for word in word_set:
+                self.assertEqual(editdist(word, u'10'), dist)
+
     def test_indexkeys(self):
         keys = indexkeys('aiu', 1)
         self.assertEqual(keys, {'aiu', 'iu', 'au', 'ai'})
@@ -97,17 +109,17 @@ class TestUtils(unittest.TestCase):
         keys = indexkeys('aiu', 4)
         self.assertEqual(keys, indexkeys('aiu', 3))
 
-    def test_editdist(self):
-        test_case = (
-            {u'10'},
-            {u'0', u'1', u'00', u'11', u'010', u'100', u'101', u'110'},
-            {u'', u'01', u'000', u'001', u'011', u'111'}
-        )
+    def test_int2byte(self):
+        self.assertEqual(int2byte(0), b'\x00')
+        self.assertEqual(int2byte(1), b'\x01')
+        self.assertEqual(int2byte(16), b'\x10')
+        self.assertEqual(int2byte(255), b'\xff')
 
-        for dist, word_set in enumerate(test_case):
-            for word in word_set:
-                self.assertEqual(editdist(word, u'10'), dist)
-
+    def test_byte2int(self):
+        self.assertEqual(byte2int(b'\x00'), 0)
+        self.assertEqual(byte2int(b'\x01'), 1)
+        self.assertEqual(byte2int(b'\x10'), 16)
+        self.assertEqual(byte2int(b'\xff'), 255)
 
 if __name__ == '__main__':
     unittest.main()
