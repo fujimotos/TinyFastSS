@@ -39,6 +39,7 @@ except NameError:
 PICKLE_PROTOCOL = 2  # The highest version with Python 2 support.
 ENCODING = 'utf-8'
 MAXDIST_KEY = b'__maxdist__'
+DELIMITER = b'\x00'
 
 
 #
@@ -108,6 +109,32 @@ def byte2int(b):
     1
     """
     return struct.unpack('B', b)[0]
+
+
+def set2bytes(s):
+    """Serialize a set of unicode strings into bytes.
+
+    >>> set2byte({u'a', u'b', u'c')
+    b'a\x00b\x00c'
+    """
+    lis = []
+    for uword in sorted(s):
+        bword = uword.encode(ENCODING)
+        lis.append(bword)
+    return DELIMITER.join(lis)
+
+
+def bytes2set(b):
+    """Deserialize bytes into a set of unicode strings.
+
+    >>> int2byte(b'a\x00b\x00c')
+    {u'a', u'b', u'c'}
+    """
+    if not b:
+        return set()
+
+    lis = b.split(DELIMITER)
+    return set(bword.decode(ENCODING) for bword in lis)
 
 
 #
