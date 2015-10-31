@@ -101,6 +101,17 @@ class FastSS:
         self.indexdb = indexdb
         self.max_dist = struct.unpack('B', indexdb['__dist__'])[0]
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()
+
+    def __contains__(self, word):
+        if word in self.indexdb:
+            return word in pickle.loads(self.indexdb[word])
+        return false
+
     @classmethod
     def open(cls, dbpath, flag='c', max_dist=2):
         indexdb = dbm.open(dbpath, flag)
@@ -112,17 +123,6 @@ class FastSS:
 
     def close(self):
         self.indexdb.close()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        self.close()
-
-    def __contains__(self, word):
-        if word in self.indexdb:
-            return word in pickle.loads(self.indexdb[word])
-        return false
 
     def add(self, word):
         if isinstance(word, bytes):
