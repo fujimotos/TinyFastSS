@@ -11,7 +11,6 @@ Create mode options:
 """
 
 from __future__ import print_function
-import locale
 import struct
 import itertools
 
@@ -38,7 +37,7 @@ except NameError:
 # Constants
 
 PICKLE_PROTOCOL = 2  # The highest version with Python 2 support.
-KEY_ENCODING = 'utf-8'
+ENCODING = 'utf-8'
 DIST_KEY = b'__dist__'
 
 
@@ -126,6 +125,9 @@ class FastSS:
         self.close()
 
     def __contains__(self, word):
+        if isinstance(word, bytes):
+            word = word.decode(ENCODING)
+
         if word in self.index:
             return word in pickle.loads(self.index[word])
         return False
@@ -143,11 +145,8 @@ class FastSS:
         self.index.close()
 
     def add(self, word):
-        if isinstance(word, bytes):
-            word = word.decode(locale.getpreferredencoding())
-
         for key in indexkeys(word, self.max_dist):
-            bkey = key.encode(KEY_ENCODING)
+            bkey = key.encode(ENCODING)
             value = {word}
 
             if bkey in self.index:
@@ -159,11 +158,8 @@ class FastSS:
         result = {x: [] for x in range(self.max_dist+1)}
         candidate = set()
 
-        if isinstance(word, bytes):
-            word = word.decode(locale.getpreferredencoding())
-
         for key in indexkeys(word, self.max_dist):
-            bkey = key.encode(KEY_ENCODING)
+            bkey = key.encode(ENCODING)
 
             if bkey in self.index:
                 candidate.update(pickle.loads(self.index[bkey]))
