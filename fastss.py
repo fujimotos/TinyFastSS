@@ -124,14 +124,6 @@ class FastSS:
     def __exit__(self, type, value, traceback):
         self.close()
 
-    def __contains__(self, word):
-        if isinstance(word, bytes):
-            word = word.decode(ENCODING)
-
-        if word in self.index:
-            return word in pickle.loads(self.index[word])
-        return False
-
     @classmethod
     def open(cls, path, flag='c', max_dist=2):
         index = dbm.open(path, flag)
