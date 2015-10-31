@@ -135,9 +135,24 @@ def bytes2set(b):
 # FastSS class
 
 class FastSS:
-    def __init__(self, index):
-        self.index = index
-        self.max_dist = byte2int(index[MAXDIST_KEY])
+    def __init__(self, path, flag='c', max_dist=2):
+        """Open an FastSS index file on <path>.
+
+        flag: the mode in which the index is opened. Use "r" for read-only,
+              "w" for read-write, "c" for read-write (create a new index if
+              not exist), "n" for read-write (always create a new index).
+
+        max_dist: the uppser threshold of edit distance for the index. Only
+                  effective when creating a new index file.
+        """
+
+        self.db = dbm.open(path, flag)
+
+        if MAXDIST_KEY in self.db:
+            self.max_dist = byte2int(self.db[MAXDIST_KEY])
+        else:
+            self.max_dist = max_dist
+            self.db[MAXDIST_KEY] = int2byte(max_dist)
 
     def __enter__(self):
         return self
@@ -147,25 +162,21 @@ class FastSS:
 
     @classmethod
     def open(cls, path, flag='c', max_dist=2):
-        index = dbm.open(path, flag)
-
-        if MAXDIST_KEY not in index:
-            index[MAXDIST_KEY] = int2byte(max_dist)
-
-        return cls(index)
+        """Conventional interface for opening FastSS index file"""
+        return cls(path, flag, max_dist)
 
     def close(self):
-        self.index.close()
+        self.db.close()
 
     def add(self, word):
         for key in indexkeys(word, self.max_dist):
             bkey = key.encode(ENCODING)
             value = {word}
 
-            if bkey in self.index:
-                value |= bytes2set(self.index[bkey])
+            if bkey in self.db:
+                value |= bytes2set(self.db[bkey])
 
-            self.index[bkey] = set2bytes(value)
+            self.db[bkey] = set2bytes(value)
 
     def query(self, word):
         result = {x: [] for x in range(self.max_dist+1)}
@@ -174,8 +185,8 @@ class FastSS:
         for key in indexkeys(word, self.max_dist):
             bkey = key.encode(ENCODING)
 
-            if bkey in self.index:
-                candidate.update(bytes2set(self.index[bkey]))
+            if bkey in self.db:
+                candidate.update(bytes2set(self.db[bkey]))
 
         for cand in candidate:
             dist = editdist(word, cand)
