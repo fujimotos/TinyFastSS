@@ -46,7 +46,11 @@ PICKLE_PROTOCOL = 2  # The highest version with Python 2 support.
 # Utils
 
 def editdist(s1, s2):
-    """Return the Levenshtein distance between two strings"""
+    """Return the Levenshtein distance between two strings.
+
+    >>> editdist('aiu', 'aie')
+    1
+    """
 
     matrix = {}
 
@@ -74,8 +78,6 @@ def indexkeys(word, max_dist):
 
     >>> indexkeys('aiu', 1)
     {'aiu', 'iu', 'au', 'ai'}
-    >>> indexkeys('aiu', 2)
-    {'aiu', 'iu', 'au', 'ai', 'u', 'i', 'a'}
     """
 
     res = set()
