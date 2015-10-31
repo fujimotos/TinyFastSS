@@ -2,12 +2,20 @@
 
 Command-line usage:
 
-  fastss.py -c index.dat filepath - Create a new index file.
+  fastss.py -c index.dat wordfile - Create a new index from the word file.
   fastss.py -q index.dat string   - Query the index with <string>.
+
+Arguments:
+
+  wordfile - path to the dictionary file which contains a list of words
+             (in a one-word-per-line manner). <sys.stdin> is used when
+             the argument is omitted.
+  string   - any query word.
 
 Create mode options:
 
-  --maxdist <N> - Maximum edit distance for the index (default: 2)
+  --maxdist  <N> - maximum edit distance for the index (default: 2)
+  --encoding <S> - the encoding of the dictionary file.
 """
 
 from __future__ import print_function
@@ -202,9 +210,9 @@ if __name__ == '__main__':
 
     CREATE, QUERY = 1, 2
     path, action, flag = None, None, None
-    max_dist = 2
+    max_dist, encoding = 2, "utf-8"
 
-    opts, args = getopt.getopt(sys.argv[1:], 'c:q:', 'maxdist=')
+    opts, args = getopt.getopt(sys.argv[1:], 'c:q:', ('maxdist=', 'encoding='))
     for key, val in opts:
         if key == '-c':
             path, action, flag = val, CREATE, 'n'
@@ -212,6 +220,8 @@ if __name__ == '__main__':
             path, action, flag = val, QUERY, 'r'
         elif key == "--maxdist":
             max_dist = int(val)
+        elif key == "--encoding":
+            encoding = val
 
     if action is None or path is None:
         print(__doc__, file=sys.stderr)
@@ -219,7 +229,8 @@ if __name__ == '__main__':
 
     if action == CREATE:
         with FastSS.open(path, flag, max_dist) as fastss:
-            for line in fileinput.input(args):
+            hook = fileinput.hook_encoded(encoding)
+            for line in fileinput.input(args, openhook=hook):
                 line = line.strip()
                 if line:
                     fastss.add(line)
