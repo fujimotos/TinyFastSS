@@ -160,6 +160,12 @@ class FastSS:
     def __exit__(self, type, value, traceback):
         self.close()
 
+    def __contains__(self, word):
+        bkey = word.encode(ENCODING)
+        if bkey in self.db:
+            return word in bytes2set(self.db[bkey])
+        return False
+
     @classmethod
     def open(cls, path, flag='c', max_dist=2):
         """Conventional interface for opening FastSS index file"""
