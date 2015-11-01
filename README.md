@@ -29,7 +29,9 @@ Clone the source code and run 'setup.py':
 Basic usage
 -----------
 
-### 1. Create an index file.
+### 1. Programmatic usage
+
+#### 1.1. Create an index file.
 
 ```python
 import fastss
@@ -39,7 +41,7 @@ with fastss.open('fastss.dat') as index:
         index.add(word.strip())
 ```
 
-### 2. Perform a fuzzy string search.
+#### 1.2. Perform a fuzzy string search.
 
 ```python
 import fastss
@@ -49,6 +51,26 @@ with fastss.open('fastss.dat') as index:
     print(index.query('test'))
 ```
 
+### 2. Command-line usage
+
+#### 2.1. Create an index file from stdin.
+
+```bash
+$ head -n 5 dictionary.txt
+aahed
+aahing
+aalii
+aaliis
+aardvark
+$ cat dictionary.txt | python -m fastss -c fastss.dat
+```
+
+#### 2.2. Perform a fuzzy string search.
+
+```bash
+$ python -m fastss -q fastss.dat asparagus
+{"0": ["asparagus"], "1": [], "2": ["asparagic", "apparatus", "asparagin"]}
+```
 
 Implementation notes
 --------------------
