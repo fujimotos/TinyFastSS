@@ -29,9 +29,7 @@ Clone the source code and run 'setup.py':
 Basic usage
 -----------
 
-### 1. Programmatic usage
-
-#### 1.1. Create an index file.
+(1) Create an index file.
 
 ```python
 import fastss
@@ -41,7 +39,7 @@ with fastss.open('fastss.dat') as index:
         index.add(word.strip())
 ```
 
-#### 1.2. Perform a fuzzy string search.
+(2) Perform a fuzzy string search.
 
 ```python
 import fastss
@@ -51,25 +49,48 @@ with fastss.open('fastss.dat') as index:
     print(index.query('test'))
 ```
 
-### 2. Command-line usage
+Performance
+-----------
 
-#### 2.1. Create an index file from stdin.
+A simple speed testing was done to grasp the overall performance of TinyFastSS.
 
-```bash
-$ head -n 5 dictionary.txt
-aahed
-aahing
-aalii
-aaliis
-aardvark
-$ cat dictionary.txt | python -m fastss -c fastss.dat
+The machine used in this test had Intel Core i3-4010U (1.70GHz) processor
+with 4GB memory.
+
+The dictionary used in this test was one derived from
+[SCOWL v2015-08-24](http://wordlist.aspell.net/) (english-50), which
+contained 98,986 English words (909 KB in disk size).
+
+**1. Index creation performance**
+
+* Roughly it took 3 minutes to complete the index creation.
+* The size of the resulting index file was 161 MB.
+
+```
+$ time python -m fastss -c fastss.dat dictonary.txt
+3m0.71s real     2m44.35s user     0m16.43s system
+$ stat --format=%s fastss.dat
+168214528
 ```
 
-#### 2.2. Perform a fuzzy string search.
+**2. Query performance**
 
-```bash
-$ python -m fastss -q fastss.dat asparagus
-{"0": ["asparagus"], "1": [], "2": ["asparagic", "apparatus", "asparagin"]}
+* With randomly chosen words, it took around 5ms to perform a single search
+  on average.
+* The actual time varied between 1.16ms (with "nirvana") and 11.7ms (with
+  "burn").
+
+```
+$ python -m timeit -s 'import fastss; index=fastss.open("fastss.dat")' 'index.query("sterner")'
+100 loops, best of 3: 7.67 msec per loop
+$ python -m timeit -s 'import fastss; index=fastss.open("fastss.dat")' 'index.query("spotlighted")'
+100 loops, best of 3: 2.43 msec per loop
+$ python -m timeit -s 'import fastss; index=fastss.open("fastss.dat")' 'index.query("burn")'
+100 loops, best of 3: 11.7 msec per loop
+$ python -m timeit -s 'import fastss; index=fastss.open("fastss.dat")' 'index.query("nirvana")'
+1000 loops, best of 3: 1.16 msec per loop
+$ python -m timeit -s 'import fastss; index=fastss.open("fastss.dat")' 'index.query("conveyor")'
+100 loops, best of 3: 1.99 msec per loop
 ```
 
 Implementation notes
