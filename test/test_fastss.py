@@ -4,9 +4,8 @@ import tempfile
 import itertools
 import shutil
 
-from fastss import (
-    FastSS, editdist, indexkeys, int2byte, byte2int, set2bytes, bytes2set
-)
+from fastss import (FastSS, editdist, indexkeys, int2byte, byte2int,
+                    set2bytes, bytes2set)
 
 
 class TestFastSS(unittest.TestCase):
@@ -31,11 +30,10 @@ class TestFastSS(unittest.TestCase):
     def test_add_words(self):
         dbpath = os.path.join(self.tmpdir, self.DBNAME)
         words = (
-            ('0', '1', '00', '01', '10', '11')
-            + ('000', '001', '010', '011', '100', '101', '110', '111')
-            + ('0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111')
-            + ('1000', '1001', '1010', '1011', '1100', '1101', '1110', '1111')
-        )
+            '0', '1', '00', '01', '10', '11',
+            '000', '001', '010', '011', '100', '101', '110', '111',
+            '0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111',
+            '1000', '1001', '1010', '1011', '1100', '1101', '1110', '1111')
 
         with FastSS.open(dbpath, 'n') as fastss:
             for word in words:
@@ -48,14 +46,14 @@ class TestFastSS(unittest.TestCase):
                 '111', '001', '010', '100', '011', '101', '110', '00'
             })
 
+
 class TestUtils(unittest.TestCase):
 
     def test_editdist(self):
         test_case = (
             {u'10'},
             {u'0', u'1', u'00', u'11', u'010', u'100', u'101', u'110'},
-            {u'', u'01', u'000', u'001', u'011', u'111'}
-        )
+            {u'', u'01', u'000', u'001', u'011', u'111'})
 
         for dist, word_set in enumerate(test_case):
             for word in word_set:
@@ -91,16 +89,14 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(set2bytes({'a', 'b', 'c'}), b'a\x00b\x00c')
         self.assertEqual(
             set2bytes({u'\u3042', u'\u3043'}),
-            b'\xe3\x81\x82\x00\xe3\x81\x83'
-        )
+            b'\xe3\x81\x82\x00\xe3\x81\x83')
 
     def test_byte2set(self):
         self.assertEqual(bytes2set(b''), set())
         self.assertEqual(bytes2set(b'a\x00b\x00c'), {'a', 'b', 'c'})
         self.assertEqual(
             bytes2set(b'\xe3\x81\x82\x00\xe3\x81\x83'),
-            {u'\u3042', u'\u3043'}
-        )
+            {u'\u3042', u'\u3043'})
 
 if __name__ == '__main__':
     unittest.main()

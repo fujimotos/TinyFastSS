@@ -222,7 +222,8 @@ if __name__ == '__main__':
     path, action, flag = None, None, None
     max_dist, encoding = 2, "utf-8"
 
-    opts, args = getopt.getopt(sys.argv[1:], 'hc:q:', ('maxdist=', 'encoding='))
+    long_opts = ('maxdist=', 'encoding=')
+    opts, args = getopt.getopt(sys.argv[1:], 'hc:q:', long_opts)
     for key, val in opts:
         if key == '-c':
             path, action, flag = val, CREATE, 'n'
