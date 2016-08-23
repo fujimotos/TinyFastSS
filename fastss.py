@@ -218,12 +218,15 @@ if __name__ == '__main__':
     path, action, flag = None, None, None
     max_dist, encoding = 2, "utf-8"
 
-    opts, args = getopt.getopt(sys.argv[1:], 'c:q:', ('maxdist=', 'encoding='))
+    opts, args = getopt.getopt(sys.argv[1:], 'hc:q:', ('maxdist=', 'encoding='))
     for key, val in opts:
         if key == '-c':
             path, action, flag = val, CREATE, 'n'
         elif key == "-q":
             path, action, flag = val, QUERY, 'r'
+        elif key == "-h":
+            print(__doc__, file=sys.stderr)
+            sys.exit(0)
         elif key == "--maxdist":
             max_dist = int(val)
         elif key == "--encoding":
