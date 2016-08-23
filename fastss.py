@@ -1,21 +1,25 @@
-"""A simple implementation of FastSS
+"""Create and query FastSS index for string simirality search.
 
 Command-line usage:
 
-  fastss.py -c index.dat wordfile - Create a new index from the word file.
-  fastss.py -q index.dat string   - Query the index with <string>.
+  Create a new index from dictionary:
 
-Arguments:
+    python -m fastss -c index.dat <file>
 
-  wordfile - path to the dictionary file which contains a list of words
-             (in a one-word-per-line manner). <sys.stdin> is used when
-             the argument is omitted.
-  string   - any query word.
+  Query an index file:
+
+    python -m fastss -q index.dat <query>
 
 Create mode options:
 
-  --maxdist  <N> - maximum edit distance for the index (default: 2)
-  --encoding <S> - the encoding of the dictionary file.
+  --maxdist  <N> maximum edit distance for the index (default: 2)
+  --encoding <S> the encoding of the dictionary file.
+
+Note:
+
+  For creating an index, you need to pass a dictionary file which
+  contains a list of words in a one-word-per-line manner. If <file>
+  argument is omitted, it tries to read from stdin.
 """
 
 from __future__ import print_function
