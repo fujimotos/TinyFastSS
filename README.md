@@ -49,6 +49,22 @@ with fastss.open('fastss.dat') as index:
     print(index.query('test'))
 ```
 
+Command-line usage
+------------------
+
+You can also use fastss.py from the command line.
+Here is a bare minimum example:
+
+    $ cat dictionary.txt | head -n 3
+    aardvark
+    abacus
+    aerial
+    $ python -m fastss -c index.dat dictionary.txt
+    $ python -m fastss -q index.dat adaptive
+    {"0": ["adaptive"], "1": ["adoptive"], "2": ["additive"]}
+
+Invoke "python -m fastss -h" for more details.
+
 Performance
 -----------
 
