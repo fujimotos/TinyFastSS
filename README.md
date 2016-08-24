@@ -21,10 +21,9 @@ Features
 How to install
 --------------
 
-Clone the source code and run 'setup.py':
+You can install via pip:
 
-    $ python setup.py install
-
+    $ pip install TinyFastSS
 
 Basic usage
 -----------
