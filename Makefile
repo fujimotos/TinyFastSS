@@ -1,6 +1,6 @@
 # Makefile for TinyFastSS
 #
-# Mostly for developemnt.
+# Mostly for development.
 
 PYTHON=/usr/bin/env python
 
