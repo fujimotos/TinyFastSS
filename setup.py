@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='TinyFastSS',
-    version='v2.0.1',
+    version='v2.0.2',
     py_modules=['fastss'],
     author='Fujimoto Seiji',
     author_email='fujimoto@ceptord.net',
@@ -14,10 +14,8 @@ in 2007.
 
 TinyFastSS is a simple Python implementation of FastSS, written in less than
 300 LoC.""",
-    license='MIT',
     classifiers=[
         'Development Status :: 4 - Beta',
-        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',

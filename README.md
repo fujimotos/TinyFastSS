@@ -121,9 +121,3 @@ and each word-list is serialized into a byte string delimited by null
 bytes (b'\x00'). Here is an example of a (key, value) pair:
 
     (b'almond', b'almond\x00almonds\x00almondy')
-
-
-License
--------
-
-MIT License (see LICENSE for details)
